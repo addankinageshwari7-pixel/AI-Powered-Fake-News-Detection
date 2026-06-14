@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VeritasAI — AI-Powered Fake News Detection</title>
+  <meta name="description" content="Detect fake vs. real news in real time with explainable AI. TF-IDF + Logistic Regression model, confidence scoring, risk levels, and analytics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-pro fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#home">
+      <span class="brand-dot"></span>VeritasAI
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link nav-anchor" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link nav-anchor" href="#analyzer">News Analyzer</a></li>
+        <li class="nav-item"><a class="nav-link nav-anchor" href="#insights">AI Insights</a></li>
+        <li class="nav-item"><a class="nav-link nav-anchor" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link nav-anchor" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header id="home" class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <div class="eyebrow">AI · NLP · Trust</div>
+        <h1 class="h-hero">Detect fake news in seconds, with explainable AI.</h1>
+        <p class="lead-pro mt-3 mb-4" style="max-width: 620px;">
+          VeritasAI analyzes news articles and headlines using TF-IDF and Logistic Regression to predict
+          authenticity, surface the signals behind the verdict, and quantify trust.
+        </p>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="#analyzer" class="btn btn-pro nav-anchor">Analyze News</a>
+          <a href="#insights" class="btn btn-ghost nav-anchor">View Insights</a>
+        </div>
+
+        <div class="row g-3 mt-4">
+          <div class="col-6 col-md-3"><div class="stat"><div class="num" id="model-accuracy">—</div><div class="label">Model Accuracy</div></div></div>
+          <div class="col-6 col-md-3"><div class="stat"><div class="num" id="model-samples">{{ meta.samples }}</div><div class="label">Training Samples</div></div></div>
+          <div class="col-6 col-md-3"><div class="stat"><div class="num" data-counter="<1s">—</div><div class="label">Avg. Latency</div></div></div>
+          <div class="col-6 col-md-3"><div class="stat"><div class="num" data-counter="100%">—</div><div class="label">Private by Design</div></div></div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="hero-visual">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="text-muted small">veritas.live / verdict</div>
+            <span class="badge-real">REAL · 94.6%</span>
+          </div>
+          <div class="hero-grid">
+            <div class="hero-cell"></div><div class="hero-cell accent"></div><div class="hero-cell"></div>
+            <div class="hero-cell"></div><div class="hero-cell"></div><div class="hero-cell accent"></div>
+            <div class="hero-cell accent"></div><div class="hero-cell"></div><div class="hero-cell"></div>
+            <div class="hero-cell"></div><div class="hero-cell accent"></div><div class="hero-cell"></div>
+          </div>
+          <div class="mt-3 small text-muted">
+            Tokenized · TF-IDF (1-2 grams) · Logistic Regression · Explainability layer
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Analyzer -->
+<section id="analyzer" class="section">
+  <div class="container">
+    <div class="row align-items-end mb-4">
+      <div class="col-md-8">
+        <div class="eyebrow">News Analyzer</div>
+        <h2 class="h-section">Paste an article, headline, or URL.</h2>
+      </div>
+      <div class="col-md-4 text-md-end lead-pro">Results in under a second.</div>
+    </div>
+
+    <div class="glass analyzer">
+      <ul class="nav nav-tabs nav-tabs-pro mb-3" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-text" type="button">Article Text</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-url" type="button">URL</button></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-text">
+          <form id="text-form">
+            <label class="form-label">News article or headline</label>
+            <textarea id="text-input" class="form-control" rows="7" placeholder="Paste a news article or headline here..."></textarea>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <span class="text-muted small">Tip: more text → more reliable classification.</span>
+              <button class="btn btn-pro" type="submit">Detect Fake News</button>
+            </div>
+          </form>
+        </div>
+        <div class="tab-pane fade" id="tab-url">
+          <form id="url-form">
+            <label class="form-label">Article URL</label>
+            <input id="url-input" type="url" class="form-control" placeholder="https://example.com/news/article" />
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <span class="text-muted small">We fetch the page and extract the main article text.</span>
+              <button class="btn btn-pro" type="submit">Analyze URL</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="result-error" class="alert-pro mt-4 d-none"></div>
+
+      <div id="result-panel" class="mt-4 d-none">
+        <div class="result-grid mb-3">
+          <div class="result-card"><div class="lbl">Prediction</div><div class="val" id="r-prediction">—</div></div>
+          <div class="result-card"><div class="lbl">Confidence</div><div class="val" id="r-confidence">—</div></div>
+          <div class="result-card"><div class="lbl">Risk Level</div><div class="val" id="r-risk">—</div></div>
+          <div class="result-card"><div class="lbl">Authenticity</div><div class="val" id="r-auth">—</div></div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="result-card">
+              <div class="lbl mb-2">Confidence</div>
+              <div class="progress-pro"><span id="r-conf-bar" style="width:0%"></span></div>
+              <div class="lbl mt-3 mb-2">Authenticity</div>
+              <div class="progress-pro"><span id="r-auth-bar" style="width:0%"></span></div>
+              <div class="row mt-3">
+                <div class="col-6"><div class="lbl">Trust Score</div><div class="val" id="r-trust" style="font-size:1.1rem">—</div></div>
+                <div class="col-6"><div class="lbl">Sentiment</div><div class="val" id="r-sentiment" style="font-size:1.1rem">—</div></div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-6"><div class="lbl">Model</div><div id="r-model" class="small mt-1">—</div></div>
+                <div class="col-6"><div class="lbl">Words</div><div id="r-words" class="small mt-1">—</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="result-card h-100">
+              <div class="lbl mb-2">Explainability</div>
+              <p id="r-explanation" class="mb-3"></p>
+              <div class="lbl mb-1">Top Signals</div>
+              <div id="r-signals" class="mb-3"></div>
+              <div class="lbl mb-1">Keywords</div>
+              <div id="r-keywords"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="r-source" class="result-card mt-3 d-none">
+          <div class="lbl">Source URL</div>
+          <a id="r-source-url" href="#" target="_blank" rel="noopener" class="d-inline-block mb-2">—</a>
+          <div class="lbl">Extracted Preview</div>
+          <p id="r-source-preview" class="text-muted small mb-0"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI Insights -->
+<section id="insights" class="section">
+  <div class="container">
+    <div class="row align-items-end mb-4">
+      <div class="col-md-8">
+        <div class="eyebrow">AI Insights</div>
+        <h2 class="h-section">Live analytics for your detections.</h2>
+      </div>
+      <div class="col-md-4 text-md-end lead-pro">Updates as you analyze.</div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-4"><div class="stat"><div class="num" id="stat-total">0</div><div class="label">Total Analyses</div></div></div>
+      <div class="col-md-4"><div class="stat"><div class="num text-success" id="stat-real">0</div><div class="label">Classified Real</div></div></div>
+      <div class="col-md-4"><div class="stat"><div class="num" style="color:#f87171" id="stat-fake">0</div><div class="label">Classified Fake</div></div></div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-5"><div class="chart-card"><h6>Real vs Fake Distribution</h6><canvas id="chart-distribution" height="220"></canvas></div></div>
+      <div class="col-md-7"><div class="chart-card"><h6>Confidence Buckets</h6><canvas id="chart-confidence" height="220"></canvas></div></div>
+      <div class="col-md-5"><div class="chart-card"><h6>Model Performance</h6><canvas id="chart-performance" height="240"></canvas></div></div>
+      <div class="col-md-7"><div class="chart-card"><h6>Recent Confidence Trend</h6><canvas id="chart-trend" height="240"></canvas></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="section-tight">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="eyebrow">Capabilities</div>
+        <h2 class="h-section">Engineered for trust.</h2>
+      </div>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="feature"><div class="ico">AI</div><h5>AI Classification</h5><p>TF-IDF features fed into a calibrated Logistic Regression classifier.</p></div></div>
+      <div class="col-md-4"><div class="feature"><div class="ico">NL</div><h5>NLP Analysis</h5><p>Tokenization, stop-word removal, sentiment, and keyword surfacing.</p></div></div>
+      <div class="col-md-4"><div class="feature"><div class="ico">TS</div><h5>Trust Score</h5><p>Blended score combining confidence, authenticity, and content depth.</p></div></div>
+      <div class="col-md-4"><div class="feature"><div class="ico">⚡</div><h5>Fast Processing</h5><p>Sub-second inference. Lightweight model, no GPU required.</p></div></div>
+      <div class="col-md-4"><div class="feature"><div class="ico">🔒</div><h5>Privacy Focused</h5><p>No content is stored. Predictions run in-memory and discarded.</p></div></div>
+      <div class="col-md-4"><div class="feature"><div class="ico">XAI</div><h5>Explainable AI</h5><p>Every verdict ships with the top tokens that drove the decision.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about" class="section">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-6">
+        <div class="eyebrow">About</div>
+        <h2 class="h-section">A production-grade fake news classifier.</h2>
+        <p class="lead-pro mt-3">
+          VeritasAI is a full-stack reference implementation of an AI-powered fake news detection system.
+          It pairs a robust NLP pipeline with an interpretable linear model, then layers a clean,
+          professional interface for analysts, researchers, and curious readers.
+        </p>
+        <ul class="lead-pro" style="line-height:2;">
+          <li>Detect REAL vs FAKE with calibrated confidence</li>
+          <li>Explain every verdict with contributing signals</li>
+          <li>Quantify trust, risk, and authenticity in one view</li>
+          <li>Stream live analytics through an integrated dashboard</li>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <div class="glass">
+          <h5 class="mb-3">Technology Stack</h5>
+          <div class="row">
+            <div class="col-6">
+              <div class="lbl text-muted small mb-1">Backend</div>
+              <ul class="lead-pro" style="font-size:.95rem"><li>Python</li><li>Flask</li><li>Scikit-learn</li><li>Pandas / NumPy</li><li>Joblib</li></ul>
+            </div>
+            <div class="col-6">
+              <div class="lbl text-muted small mb-1">Frontend</div>
+              <ul class="lead-pro" style="font-size:.95rem"><li>HTML5 / CSS3</li><li>Bootstrap 5</li><li>Vanilla JS</li><li>Chart.js</li></ul>
+            </div>
+          </div>
+          <hr style="border-color: var(--panel-border)">
+          <div class="lbl text-muted small mb-1">ML Pipeline</div>
+          <p class="lead-pro mb-0" style="font-size:.95rem">
+            Text cleaning → stop-word removal → TF-IDF (1–2 grams) → Logistic Regression (primary),
+            Passive Aggressive Classifier (auxiliary). Models persisted with Joblib.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact" class="section">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-5">
+        <div class="eyebrow">Contact</div>
+        <h2 class="h-section">Talk to the team.</h2>
+        <p class="lead-pro mt-3">Questions, integrations, or research collaborations — we'd like to hear from you.</p>
+        <div class="mt-4 lead-pro">
+          <div>hello@veritasai.example</div>
+          <div class="mt-2"><a href="#">Twitter</a> · <a href="#">GitHub</a> · <a href="#">LinkedIn</a></div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <form id="contact-form" class="glass">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Name</label>
+              <input id="c-name" required class="form-control form-control-pro" type="text" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input id="c-email" required class="form-control form-control-pro" type="email" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Subject</label>
+              <input id="c-subject" required class="form-control form-control-pro" type="text" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Message</label>
+              <textarea id="c-message" required class="form-control form-control-pro" rows="5"></textarea>
+            </div>
+            <div class="col-12 d-flex justify-content-between align-items-center">
+              <span id="contact-status" class="small"></span>
+              <button class="btn btn-pro" type="submit">Send Message</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>© <span id="year"></span> VeritasAI · AI-Powered Fake News Detection</div>
+    <div>
+      <a href="#home" class="nav-anchor">Home</a>
+      <a href="#analyzer" class="nav-anchor">Analyzer</a>
+      <a href="#insights" class="nav-anchor">Insights</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
