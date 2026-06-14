@@ -1,0 +1,7 @@
+{
+  "trained_at": "2026-06-14T06:55:08.083125Z",
+  "samples": 40,
+  "lr_accuracy": 1.0,
+  "pa_accuracy": 1.0,
+  "features": 660
+}
